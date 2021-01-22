@@ -1,12 +1,10 @@
 package cc.mm.test2.repository;
 
 import cc.mm.test2.enity.Site;
-import org.hibernate.annotations.SQLUpdate;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -42,6 +40,5 @@ public interface MapperSite extends PagingAndSortingRepository<Site, String> {
     @Modifying
     @Query(value = "delete from Site where id = :id")
     void mySqlDeleteById(@Param("id") String id);
-
 
 }

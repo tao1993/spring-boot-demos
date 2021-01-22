@@ -17,6 +17,4 @@ public class Site {
     String url;
     String title;
 
-
-
 }

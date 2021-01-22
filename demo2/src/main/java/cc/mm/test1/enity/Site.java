@@ -1,4 +1,4 @@
-package cc.mm.test1.controller.enity;
+package cc.mm.test1.enity;
 
 import lombok.Data;
 
@@ -8,7 +8,5 @@ public class Site {
 
     String url;
     String title;
-
-
 
 }

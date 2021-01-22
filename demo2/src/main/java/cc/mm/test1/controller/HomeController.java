@@ -1,9 +1,8 @@
 package cc.mm.test1.controller;
 
 
-import cc.mm.test1.controller.enity.Site;
-import cc.mm.test1.controller.repository.MapperSite;
-import org.apache.ibatis.annotations.*;
+import cc.mm.test1.enity.Site;
+import cc.mm.test1.repository.MapperSite;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 
 @Controller
 public class HomeController {
@@ -55,9 +53,5 @@ public class HomeController {
         mapperSite.deleteSiteById(req.getParameter("id"));
         return mapperSite.getAllSites();
     }
-
-
-
-
 
 }

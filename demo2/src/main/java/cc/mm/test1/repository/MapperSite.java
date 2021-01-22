@@ -1,7 +1,7 @@
-package cc.mm.test1.controller.repository;
+package cc.mm.test1.repository;
 
 
-import cc.mm.test1.controller.enity.Site;
+import cc.mm.test1.enity.Site;
 import org.apache.ibatis.annotations.*;
 
 import java.util.ArrayList;
