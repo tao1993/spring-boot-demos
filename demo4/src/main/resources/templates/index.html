@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+    <!-- 引入vue  -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- 引入element ui  -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <!-- 引入axios  -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+<div id="app">
+    <el-menu
+            :default-active="activeIndex2"
+            class="el-menu-demo"
+            mode="horizontal"
+            @select="handleSelect"
+            background-color="#545c64"
+            text-color="#fff"
+            active-text-color="#ffd04b">
+
+        <el-menu-item index="1">首页</el-menu-item>
+
+
+        <!-- <el-menu-item v-if="isLogined"  >-->
+        <el-menu-item @click="postProfileWithToken">
+            我的资料(带token请求)
+        </el-menu-item>
+
+        <el-menu-item @click="postProfileWithoutToken">
+            我的资料(不带token请求)
+        </el-menu-item>
+
+        <!--登录时显示-->
+        <el-menu-item v-if="isLogined" @click="onLogout">注销</el-menu-item>
+
+
+        <!--未登录时显示-->
+        <el-menu-item v-if="!isLogined" index="4">
+            <el-form :inline="true" :model="userData" class="demo-form-inline">
+                <el-form-item>
+                    <el-input style="margin-top: 7px;" v-model="userData.userName" placeholder="账号"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-input style="margin-top: 7px;" v-model="userData.userPass" placeholder="密码"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button style="margin-top: 7px;" type="primary" @click="onSubmit">登录</el-button>
+                </el-form-item>
+            </el-form>
+        </el-menu-item>
+
+
+
+        <!--登录时显示-->
+        <el-menu-item v-if="isLogined">欢迎用户: {{ currentUserName }}</el-menu-item>
+    </el-menu>
+</div>
+
+</body>
+
+<script>
+    //Base64工具，可以用来前台解码token，拿到token的payload的用户信息
+    Base64 = { _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", encode: function(e) { var t = ""; var n, r, i, s, o, u, a; var f = 0; e = Base64._utf8_encode(e); while (f < e.length) { n = e.charCodeAt(f++); r = e.charCodeAt(f++); i = e.charCodeAt(f++); s = n >> 2; o = (n & 3) << 4 | r >> 4; u = (r & 15) << 2 | i >> 6; a = i & 63; if (isNaN(r)) { u = a = 64 } else if (isNaN(i)) { a = 64 } t = t + this._keyStr.charAt(s) + this._keyStr.charAt(o) + this._keyStr.charAt(u) + this._keyStr.charAt(a) } return t }, decode: function(e) { var t = ""; var n, r, i; var s, o, u, a; var f = 0; e = e.replace(/[^A-Za-z0-9+/=]/g, ""); while (f < e.length) { s = this._keyStr.indexOf(e.charAt(f++)); o = this._keyStr.indexOf(e.charAt(f++)); u = this._keyStr.indexOf(e.charAt(f++)); a = this._keyStr.indexOf(e.charAt(f++)); n = s << 2 | o >> 4; r = (o & 15) << 4 | u >> 2; i = (u & 3) << 6 | a; t = t + String.fromCharCode(n); if (u != 64) { t = t + String.fromCharCode(r) } if (a != 64) { t = t + String.fromCharCode(i) } } t = Base64._utf8_decode(t); return t }, _utf8_encode: function(e) { e = e.replace(/rn/g, "n"); var t = ""; for (var n = 0; n < e.length; n++) { var r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r) } else if (r > 127 && r < 2048) { t += String.fromCharCode(r >> 6 | 192); t += String.fromCharCode(r & 63 | 128) } else { t += String.fromCharCode(r >> 12 | 224); t += String.fromCharCode(r >> 6 & 63 | 128); t += String.fromCharCode(r & 63 | 128) } } return t }, _utf8_decode: function(e) { var t = ""; var n = 0; var r = c1 = c2 = 0; while (n < e.length) { r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r); n++ } else if (r > 191 && r < 224) { c2 = e.charCodeAt(n + 1); t += String.fromCharCode((r & 31) << 6 | c2 & 63); n += 2 } else { c2 = e.charCodeAt(n + 1); c3 = e.charCodeAt(n + 2); t += String.fromCharCode((r & 15) << 12 | (c2 & 63) << 6 | c3 & 63); n += 3 } } return t } }
+</script>
+
+<script>
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            activeIndex: '1',
+            activeIndex2: '1',
+            userData: {
+                userName: '',
+                userPass: ''
+            }
+        },
+        methods: {
+            handleSelect(key, keyPath) {
+                //console.log(key, keyPath);
+            },
+            toProfile() {
+                location.href = "/profile";
+            },
+            onSubmit() {
+
+                //用户登录，post请求向后台 验证账号和密码
+                let user = this.userData;
+                axios.post('/login', {
+                    userName: user.userName,
+                    userPass: user.userPass
+                }).then(function (response) {
+                    //console.log(response);
+
+                    if (response.data.result === 'fail') {
+                        app.$message('登录失败');
+                    } else if (response.data.result === 'success') {
+                        console.log(response.data.token)
+                        //登录成功，拿到token，放入localStorage
+                        localStorage.setItem("token", response.data.token)
+                        //刷新页面
+                        location.reload();
+                    }
+
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+            onLogout() {  //注销操作
+                //清除localStorage里面的token，然后刷新页面
+                localStorage.removeItem("token");
+                location.href = "/";
+            },
+            postProfileWithToken(){  //带上token访问 /profile
+                axios({
+                    url:'/profile',
+                    method:'post',
+                    headers: {'token': localStorage.getItem("token")},
+                    data:{},
+                }).then(function (response) {
+                    app.$message(JSON.stringify(response.data));
+                    console.log(response);
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+            postProfileWithoutToken(){  // 不带token访问 /profile
+                axios({
+                    url:'/profile',
+                    method:'post',
+                    data:{},
+                }).then(function (response) {
+                    app.$message(JSON.stringify(response.data));
+                    console.log(response);
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            }
+        },
+        computed: {
+            isLogined() {
+                //判断当前是否有用户已登录状态，从localstorage里面找token
+                //没有token说明未登录
+                if (localStorage.getItem("token")) {
+                    return true;
+                }
+                return false;
+            },
+            currentUserName(){
+                //解析localStorage里面的token，获得payload部分的用户信息userName
+                let token = localStorage.getItem("token");
+                let user = decodeURIComponent(escape(window.atob(token.split('.')[1])));
+                let userName = JSON.parse(user).userName;
+                return userName;
+            }
+        }
+
+    })
+</script>
+
+
+</html>
